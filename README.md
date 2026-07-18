@@ -23,6 +23,10 @@ Ember picks which game to boot from an **argument** — you pass it the name of 
 
 You bring your own `bios.bin` (a legally-required BIOS dump from your own console) — Ember does not and will not ship one.
 
+**A playable demo will be released soon. I am fixing a few more issues prior to a public test
+
+On top of this, eventual source code will be released. I plan on finishing a certain set amount of milestones prior to this.
+
 ---
 
 ## Where it stands today

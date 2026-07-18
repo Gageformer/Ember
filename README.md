@@ -7,7 +7,7 @@ Ember is a PS1 emulator that runs on the PS2 itself. You drop it onto a USB stic
 
 ## How you actually use it
 
-Ember is a single EE program (`ember.elf`) along the games you want to run, kept within a self-contained folder:
+Ember is a single executable program (`ember.elf`) along with the games you want to run, kept within a self-contained folder:
 
 ```
 Ember/

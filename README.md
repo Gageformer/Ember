@@ -19,13 +19,31 @@ Ember/
         └── Spyro.bin
 ```
 
-Ember picks which game to boot from an **argument** — you pass it the name of a folder under `games/`, and it plays that one. It ships with its own small launcher that does this for you, but nothing about it is special: any PS2 homebrew menu that can start an ELF with an argument can drive Ember directly, so you can wire it into whatever front-end you already use — uLaunchELF, OPL, a shortcut, or a custom menu of your own.
+This makes Ember portable to any drive or device of your choice. USB, MMCE etc. Ember acts as a simple back end, leaving you to start your games from a launcher of choice.
 
 You bring your own `bios.bin` (a legally-required BIOS dump from your own console) — Ember does not and will not ship one.
 
-**A playable demo will be released soon. I am fixing a few more issues prior to a public test**
+### Launching Ember from homebrew
 
-On top of this, eventual source code will be released. I plan on finishing a certain set amount of milestones prior to this.
+Ember picks which game to boot from an **argument** — you pass it the name of a folder under `games/`, and it plays that one. It ships with its own small launcher that does this for you, but nothing about it is special: any PS2 homebrew menu that can start an ELF with an argument can drive Ember directly, so you can wire it into whatever front-end you already use — uLaunchELF, OPL, a shortcut, or a custom menu of your own.
+
+**The optional argument** can be a plain folder name, or a path relative to Ember's home folder, example usage:
+
+```
+ember.elf "Crash Bandicoot"        # games/Crash Bandicoot/
+ember.elf "games/Crash"            # a folder, spelled out
+ember.elf "games/Crash/game.cue"   # a specific disc image
+```
+
+Inside a game folder Ember takes a `.cue` if there is one, otherwise a `.bin`. If it can't mount anything, it drops you into the BIOS shell rather than quietly booting something else — if you asked for a game and didn't get it, you'll know.
+
+Things to know if you're wiring this up:
+
+- The argument isn't split on spaces, so a name like `Crash Bandicoot` is a single argument passed through as-is. No escaping needed, but also no way to pass two things in one argument.
+- Paths are relative to Ember's own folder. Ember works out of where it lives from (the path it was started with). So if you launch `mass:/Ember/ember.elf`, a game argument resolves under `mass:/Ember/`.
+
+If you're building a front-end and have any questions or need something specific, please ask.
+
 
 ---
 
@@ -35,10 +53,31 @@ Ember runs real games on real PS2 silicon, at close to full speed, and the speed
 
 - **The CPU side is essentially solved.** Emulated PS1 code executes at roughly the PS1's real-time speed — around the low-90s percent of the console's frame-time budget — and that holds steady across games. In the scene it's most tuned against, the emulator sits right on the real-time line (≈300M EE cycles used against a ≈295M budget).
 - **Spyro runs at full speed.** Its scenes ask for a lighter per-frame draw load, so the whole frame stays inside budget.
-- **Crash runs full-speed in normal scenes and dips in its busiest ones.** Its dense, geometry-heavy areas hand the GPU a much larger draw list each frame, and pushing that list to the Graphics Synthesizer is the current bottleneck. This is the active area of work.
-- **Everything else is untested.** Based on how that bottleneck scales, games with Spyro-like draw loads should stay full-speed, and games with Crash-like dense scenes may dip until the GPU-submission path is optimized further.
+- **Crash runs mostly full-speed.** It is still actively being worked on, however it holds 28-30 fps within the first level.
+- **Other games remain untested.** I have started development with games I personally know. This leaves Crash and the Spyro trilogy with strong performance. There's more perf work to come, meaning Ember will only get better from here.
 
-There are still currently bugs being worked out, and all functionality is not currently implemented.
+
+---
+
+## Demo Release
+
+Ember is still pre-release and not feature complete. We have a current demo without sound and other features to simply prove it works, and find bugs.
+
+The provided launcher is a basic solution to get you started. Place it the same directory as `Ember.elf` and launch it from there.
+
+**Currently Missing, Will Come:**
+
+- **No sound.** The sound hardware is modelled well enough that games think it's working — they start music, they wait on it, they get sensible answers back — but nothing is actually rendered to the speakers yet. Audio is deliberately parked until after the demo.
+- **No memory cards.** Saves don't persist. The console answers "nothing plugged in" when a game looks for a card.
+- **Digital pad only.** No analog sticks, no rumble. Games that require a DualShock won't be happy.
+
+**Known bugs:**
+
+- **FMVs run slow.** Full-motion video is sluggish in every game that has it, not just one — so it's a shared piece of the video-decode and upload path rather than a per-game problem. One fix should help everywhere.
+- **Some games still hang.** Crash Team Racing wedges partway in, and there are certainly others I haven't found — coverage testing is ongoing.
+- **Assorted visual glitches.** A moving tear line in a select few titles, odd bright boxes around objects (Silent Hill). There are known random flickers in certain games (Crash).
+
+If you hit something that isn't on this list, please share! This helps speed up development, as I can only test so many titles myself. Fixes are not per game, and will improve overall library compatibility with each find.
 
 ---
 
@@ -59,3 +98,9 @@ There are still currently bugs being worked out, and all functionality is not cu
 - **Async disc prefetch.** The emulator reads ahead of what the game is currently asking for, so gameplay doesn't stall waiting on the CD.
 
 - **GPU-to-GS translation.** The PS1's 2D command-list GPU calls are rebuilt as Graphics Synthesizer draw calls, handling PS1-specific texture, palette, and interlace quirks explicitly.
+
+---
+
+## Source Code!?!?
+
+Eventual source code will be released. I plan on finishing a certain set amount of milestones prior to this.

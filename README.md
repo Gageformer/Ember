@@ -4,6 +4,9 @@
 
 Ember is a PS1 emulator that runs on the PS2 itself. You drop it onto a USB stick or storage device of choice, and add the `.cue`/`.bin` files for your games library. This can be launched from whatever homebrew you so choose, and it plays from there.
 
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Ember-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/gageformer)
+
+---
 
 ## How you actually use it
 
@@ -13,6 +16,7 @@ Ember is a single executable program (`ember.elf`) along with the games you want
 Ember/
 ├── ember.elf                       # the emulator
 ├── bios.bin                        # a PS1 BIOS — you supply this yourself
+├── settings.txt                    # optional, see below
 └── games/
     └── Spyro/                      # one folder per game, named however you like
         ├── Spyro.cue
@@ -23,61 +27,132 @@ This makes Ember portable to any drive or device of your choice. USB, MMCE etc. 
 
 You bring your own `bios.bin` (a legally-required BIOS dump from your own console) — Ember does not and will not ship one.
 
-### Launching Ember from homebrew
+---
 
-Ember picks which game to boot from an **argument** — you pass it the name of a folder under `games/`, and it plays that one. It ships with its own small launcher that does this for you, but nothing about it is special: any PS2 homebrew menu that can start an ELF with an argument can drive Ember directly, so you can wire it into whatever front-end you already use — uLaunchELF, OPL, a shortcut, or a custom menu of your own.
+## Launching Ember from homebrew
 
-**The optional argument** can be a plain folder name, or a path relative to Ember's home folder, example usage:
+Ember picks which game to boot from an **argument** — you pass it the name of a folder inside `games/`, and it plays that one. It ships with its own small launcher that does this for you, but nothing about it is special: any PS2 homebrew menu that can start an ELF with an argument can drive Ember directly, so you can wire it into whatever front-end you already use — uLaunchELF, OPL, a shortcut, or a custom menu of your own.
+
+**The argument is the game folder name, that resides within `games/`.**
 
 ```
-ember.elf "Crash Bandicoot"        # games/Crash Bandicoot/
-ember.elf "games/Crash"            # a folder, spelled out
-ember.elf "games/Crash/game.cue"   # a specific disc image
+ember.elf "Crash Bandicoot (USA)"     -->  games/Crash Bandicoot (USA)/
+ember.elf Spyro                       -->  games/Spyro/
 ```
 
-Inside a game folder Ember takes a `.cue` if there is one, otherwise a `.bin`. If it can't mount anything, it drops you into the BIOS shell rather than quietly booting something else — if you asked for a game and didn't get it, you'll know.
+Inside a game folder Ember takes a `.cue` if there is one, otherwise a `.bin`.
+
+
+**A refused or missing game drops you at the PS1 BIOS shell.** If you asked for something and didn't get it, you'll know immediately rather than wondering why the wrong title started.
 
 Things to know if you're wiring this up:
 
-- The argument isn't split on spaces, so a name like `Crash Bandicoot` is a single argument passed through as-is. No escaping needed, but also no way to pass two things in one argument.
-- Paths are relative to Ember's own folder. Ember works out of where it lives from (the path it was started with). So if you launch `mass:/Ember/ember.elf`, a game argument resolves under `mass:/Ember/`.
+- **Spaces are fine.** `"Crash Bandicoot (USA)"` is a single argument, passed through as-is. Some launchers may split arguments on spaces, so Ember stitches them back together for you — you don't need to escape anything.
+- **Everything is relative to Ember's own folder**, worked out from wherever it was started. Launch `mass:/Ember/ember.elf` and your games are looked for in `mass:/Ember/games/`.
+- **Name folders whatever you like.** Ember doesn't care about region tags, brackets or serial numbers.
 
 If you're building a front-end and have any questions or need something specific, please ask.
 
+---
+
+## Settings
+
+Next to `ember.elf` you can put an optional **`settings.txt`**. It's a plain text file, one `key: value` per line:
+
+```
+# Lines starting with # or ; are ignored.
+# A space after the colon is optional.
+
+display: 480
+```
+
+The file is completely optional — delete it and every default stands.
+
+### Available keys
+
+| Key | Values | What it does |
+|---|---|---|
+| `display` | `480` *(default)* | 480i. What almost every TV, capture device and upscaler expects. |
+| | `240` | True 240p "double strike" — what a CRT actually wants, and sharper on one. Some TVs and scalers refuse to lock to it. |
+
+---
+
+## Memory cards
+
+Cards are automatic — you don't have to make or format anything. The first time
+a game plays, Ember creates two cards inside that game's own folder:
+
+```
+games/
+└── Spyro/
+    ├── Spyro.cue
+    ├── Spyro.bin
+    ├── MC1.vmc          # slot 1, made for you
+    └── MC2.vmc          # slot 2, made for you
+```
+
+Each game getting its own pair means one game can never overwrite another's
+saves, and you can back a game up just by copying its folder.
+
+### Sharing one card between games
+
+Sometimes you *want* games to share — a series that carries saves forward, or
+just to keep everything in one place. Drop a file called **`SharedMC.txt`** into
+a game's folder, containing the name of the folder whose cards it should use:
+
+```
+games/
+├── Spyro/
+│   └── MC1.vmc              # the real cards live here
+└── Ripto/
+    └── SharedMC.txt         # one line: Spyro
+```
+
+Now Ripto reads and writes Spyro's cards instead of making its own.
+
+A few things that make this safe to play with:
+
+- **It's one hop.** A shared folder is never itself redirected, so you can't
+  build a loop or a chain by accident.
+- **A typo can't cost you a game.** If the name doesn't point at a real game
+  folder, Ember quietly uses that game's own cards.
+  Worst case you lose the sharing, never the save.
+- **It's just a folder name** — not a path. `Spyro`, not `games/Spyro`.
 
 ---
 
 ## Where it stands today
 
-Ember runs real games on real PS2 silicon, at close to full speed, and the speed is *measured* — read off the PS2's own onboard performance counters while a game is running, not estimated.
+Ember runs games at close to full speed, and the speed is *measured* — read off the PS2's own onboard performance counters while a game is running, rather than estimated or eyeballed.
 
-- **The CPU side is essentially solved.** Emulated PS1 code executes at roughly the PS1's real-time speed — around the low-90s percent of the console's frame-time budget — and that holds steady across games. In the scene it's most tuned against, the emulator sits right on the real-time line (≈300M EE cycles used against a ≈295M budget).
-- **Spyro runs at full speed.** Its scenes ask for a lighter per-frame draw load, so the whole frame stays inside budget.
-- **Crash runs mostly full-speed.** It is still actively being worked on, however it holds 28-30 fps within the first level.
-- **Other games remain untested.** I have started development with games I personally know. This leaves Crash and the Spyro trilogy with strong performance. There's more perf work to come, meaning Ember will only get better from here.
-
+- **Spyro runs at full speed** — locked 30fps with room to spare.
+- **Crash runs mostly full speed.** It holds 28–30fps through the first level, but sits close enough to the line that you can occasionally notice it. Still being worked on.
+- **Resident Evil 2 and Silent Hill are playable** and sit right around the real-time line, dipping under it in the heaviest scenes.
+- **Other games remain largely untested.** Development started with games I personally know well, so those have the strongest performance. I have received reports and have started to work on more titles. There's more perf work to come, and Ember only gets better from here.
 
 ---
 
-## Demo Release
+## Current Release
 
-Ember is still pre-release and not feature complete. We have a current demo without sound and other features to simply prove it works, and find bugs.
+A lot of work has been done since the first demo, leaving this as the version many were waiting for. This is not complete, expect some bugs and titles with mediocre performance. Please be patient as these are worked out.
 
-The provided launcher is a basic solution to get you started. Place it the same directory as `Ember.elf` and launch it from there.
+- **Sound.** Music, effects and CD/XA audio all play. There may be stutter or bugs still being worked out.
+- **Memory cards.** Saves persist, two card slots, made automatically per game — and games can share a card if you want them to. *See [Memory cards](#memory-cards).*
+- **Controller support.** Analog sticks and rumble. Digital pads work as they always did.
+- **PAL games run.** PAL titles play on an NTSC signal with the picture correctly positioned, rather than cropped or shifted.
+- **240p or 480i output**, your choice — see Settings above.
 
-**Currently Missing, Will Come:**
+---
 
-- **No sound.** The sound hardware is modelled well enough that games think it's working — they start music, they wait on it, they get sensible answers back — but nothing is actually rendered to the speakers yet. Audio is deliberately parked until after the demo.
-- **No memory cards.** Saves don't persist. The console answers "nothing plugged in" when a game looks for a card.
-- **Digital pad only.** No analog sticks, no rumble. Games that require a DualShock won't be happy.
+## Known bugs
 
-**Known bugs:**
+- **Some games hang.** Crash Team Racing wedges partway in, and King's Field II shows the same fault — both are the same underlying issue with how a CD command finishes, so one fix should cover both. There are certainly others reported as well.
+- **FMV audio quirks.** Full-motion videos run quite smooth, however some FMVs may have an audio stutter. This is being worked out, please be patient.
+- **Audio delivery.** Some games do not have perfect or smooth audio. There are a few known bugs, and adjustments that need to be made. If a game is underperforming, the audio will have stutter.
+- **Spyro 2's dialogue stutters** word by word. Isolated to that game so far.
+- **Assorted visual glitches.** Most visual bugs have been fixed, however a few remain. Please be patient as these are worked out.
 
-- **FMVs run slow.** Full-motion video is sluggish in every game that has it, not just one — so it's a shared piece of the video-decode and upload path rather than a per-game problem. One fix should help everywhere.
-- **Some games still hang.** Crash Team Racing wedges partway in, and there are certainly others I haven't found — coverage testing is ongoing.
-- **Assorted visual glitches.** A moving tear line in a select few titles, odd bright boxes around objects (Silent Hill). There are known random flickers in certain games (Crash).
-
-If you hit something that isn't on this list, please share! This helps speed up development, as I can only test so many titles myself. Fixes are not per game, and will improve overall library compatibility with each find.
+If you hit something that isn't on this list, please share! This helps speed up development. Fixes are rarely per-game — each one found tends to improve compatibility across the whole library.
 
 ---
 
@@ -101,6 +176,54 @@ If you hit something that isn't on this list, please share! This helps speed up 
 
 ---
 
+## Support Ember
+
+This has been a personal project of mine I have worked on for a while. I am completing this for multiple reasons, and am very happy to share the results with everyone involved with the PS2 community. However a lot of time and effort has gone into this, and any form of support goes a long way and really helps out with development. You help me out by donating over at my Ko-fi, or even by sharing any bugs you find throughout your playtime experience. Both go a long way.
+
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Ember-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/gageformer)
+
+---
+
+## Thank You
+
+I'd like to give a personal thanks to a few people, as they have helped drastically with the development process.
+A huge thanks to **zackcage6** & **TwistedZeon**! for all of their help with personally testing & reporting issues.
+I also owe credit to everyone who has helped with concepts & knowledge regarding the PS2. I have a large background in software development, but there were many learning curves starting on PS2 development that I had to overcome. I appreciate the patience and hospitality of everyone involved.
+
+---
+
 ## Source Code!?!?
 
-Eventual source code will be released. I plan on finishing a certain set amount of milestones prior to this.
+Ember is **closed source for now**, and this is a deliberate, temporary decision.
+
+The source will be released once the project hits a set of milestones I've laid
+out for myself. This project has a high personal meaning to me, and I'd like to see through that vision at this moment.
+
+---
+
+## License
+
+Ember beta builds are distributed under the **Ember Public Beta Testing
+Licence** — see [`LICENSE-BETA.txt`](LICENSE-BETA.txt).
+
+In plain terms — **use it, share what you find, build on top of it. Just don't
+sell it, and don't take the credit.**
+
+- **Yes:** run it, test it, stream it, record it, write about it. Monetised
+  channels are completely fine.
+- **Yes:** build a launcher or front-end for it. No permission needed, and
+  honestly I'd love to see it.
+- **Yes:** include it in a homebrew collection or front-end release, as long as
+  it's unmodified, credited to me by name with a link back.
+- **No:** selling it, putting it behind a paywall or link locker, or shipping it
+  on preloaded cards or drives for money.
+- **No:** repackaging it, or presenting it as your own work.
+
+Anything commercial, just ask. I'm easy-going about most things — the two I do
+care about are keeping credit where it belongs and nobody personally profiting off work
+I've given away.
+
+Ember was created by **Gageformer**. Copyright © 2026. All rights reserved.
+
+Ember contains no PlayStation BIOS or game data, and never will — you supply
+your own, from hardware and discs you own.

@@ -20,7 +20,8 @@ Ember/
 └── games/
     └── Spyro/                      # one folder per game, named however you like
         ├── Spyro.cue
-        └── Spyro.bin
+        ├── Spyro.bin
+        └── settings.txt            # optional, per-game (see Settings)
 ```
 
 This makes Ember portable to any drive or device of your choice. USB, MMCE etc. Ember acts as a simple back end, leaving you to start your games from a launcher of choice.
@@ -42,6 +43,14 @@ ember.elf Spyro                       -->  games/Spyro/
 
 Inside a game folder Ember takes a `.cue` if there is one, otherwise a `.bin`.
 
+**Want a specific file?** Add it after the folder name, and Ember boots exactly that file from the folder:
+
+```
+ember.elf "Spyro/Spyro.cue"           -->  games/Spyro/Spyro.cue
+```
+
+Memory cards and settings still come from that game's folder. Disc images always live inside a game folder, so a bare `Spyro.cue` on its own won't be accepted.
+
 
 **A refused or missing game drops you at the PS1 BIOS shell.** If you asked for something and didn't get it, you'll know immediately rather than wondering why the wrong title started.
 
@@ -50,6 +59,11 @@ Things to know if you're wiring this up:
 - **Spaces are fine.** `"Crash Bandicoot (USA)"` is a single argument, passed through as-is. Some launchers may split arguments on spaces, so Ember stitches them back together for you — you don't need to escape anything.
 - **Everything is relative to Ember's own folder**, worked out from wherever it was started. Launch `mass:/Ember/ember.elf` and your games are looked for in `mass:/Ember/games/`.
 - **Name folders whatever you like.** Ember doesn't care about region tags, brackets or serial numbers.
+- **Do not reset the IOP.** Ember inherits the drivers from its launcher. Ensure you do not reset anything as this will cause issues.
+  - Ember reads `bios.bin`, `settings.txt` and your games through the storage drivers your launcher already has loaded (USB, MMCE, HDD etc.). It never loads storage drivers of its own. If the IOP is reset before Ember starts, it can't see its own folder, and you'll land in the BIOS or get a black screen.
+  - Everything else Ember brings itself: its sound module is built into `ember.elf`, and the controller drivers come from the PS2's own ROM. Memory cards are files in the game folder, so no card drivers are needed either.
+  - Both older-style and newer (iomanX/fileXio) driver setups work. Ember detects which one it's running under.
+- **Pass the full path to `ember.elf` as the first argument (`argv[0]`).** That's how Ember finds its own folder, e.g. `mass:/Ember/ember.elf`. The game name goes after it (`argv[1]`). Most launchers already do this; a custom one that leaves `argv[0]` empty will leave Ember unable to find anything.
 
 If you're building a front-end and have any questions or need something specific, please ask.
 
@@ -66,7 +80,7 @@ Next to `ember.elf` you can put an optional **`settings.txt`**. It's a plain tex
 display: 480
 ```
 
-The file is completely optional — delete it and every default stands.
+The file is completely optional — delete it and every default stands. Keys Ember doesn't recognise are simply skipped, so an older or newer settings file won't break anything.
 
 ### Available keys
 
@@ -74,6 +88,20 @@ The file is completely optional — delete it and every default stands.
 |---|---|---|
 | `display` | `480` *(default)* | 480i. What almost every TV, capture device and upscaler expects. |
 | | `240` | True 240p "double strike" — what a CRT actually wants, and sharper on one. Some TVs and scalers refuse to lock to it. |
+| | `480p` | Progressive 480p. **Component or an HDMI adapter only**, composite shows no picture. |
+| `dither` | `on` *(default)* | The PS1's own dithering, as the games were made to look. |
+| | `off` | Smooth shading without the dither pattern. |
+| `shading` | `15` *(default)* | The PS1's native 15-bit colour. |
+| | `24` | Smoother gradients where the PS1 would band or dither. Experimental — if you want accuracy, stick with `15`. This is being redesigned for a future version, and may cause bugs or cost performance. |
+| `controller` | `auto` *(default)* | Behaves like a real DualShock: ANALOG button toggles. If a game requests ANALOG, it will automatically turn on. |
+| | `analog` | Starts with the ANALOG setting on, useful for games that support analog but do not request it. |
+| | `d2a` | For games with **no** analog support: the left stick works as the d-pad. Don't use this on analog games, it will break native analog functionality. |
+
+### Per-game settings
+
+A `settings.txt` inside a game's own folder overrides the main one for that game. Only `controller` and `shading` are read there, since `display` and `dither` stay one setting for the whole console. For example, put `controller: d2a` in an old digital-only game's folder, and leave everything else alone.
+
+It is recommended to set controller settings per game instead of general. If you put your controller on analog and a game does not support it, you will have to toggle it off or the game may not read input. Similar for D2A (digital 2 analog), you will lose analog functionality in games that have it.
 
 ---
 
@@ -123,12 +151,11 @@ A few things that make this safe to play with:
 
 ## Where it stands today
 
-Ember runs games at close to full speed, and the speed is *measured* — read off the PS2's own onboard performance counters while a game is running, rather than estimated or eyeballed.
+Ember runs most games at full speed, and the speed is *measured* — read off the PS2's own onboard performance counters while a game is running, rather than estimated or eyeballed.
 
-- **Spyro runs at full speed** — locked 30fps with room to spare.
-- **Crash runs mostly full speed.** It holds 28–30fps through the first level, but sits close enough to the line that you can occasionally notice it. Still being worked on.
-- **Resident Evil 2 and Silent Hill are playable** and sit right around the real-time line, dipping under it in the heaviest scenes.
-- **Other games remain largely untested.** Development started with games I personally know well, so those have the strongest performance. I have received reports and have started to work on more titles. There's more perf work to come, and Ember only gets better from here.
+- **Spyro & Crash run at full speed** — locked 30fps with room to spare. These were my first two games heavily tested and developed with.
+- **Resident Evil 2 and Silent Hill are playable** and sit right around the real-time line. They have randomly dipped under it in the heaviest scenes. Recent work may have fixed this.
+- **Many more titles have been tested since the first release.** Crash Team Racing, Ridge Racer Type 4, Tomb Raider II, Spider-Man, MediEvil, Breath of Fire III and others have all had performance and compatibility work, and most now run at or near full speed. The heaviest scenes in some games can still dip. There's more perf work to come, and Ember only gets better from here.
 
 ---
 
@@ -136,20 +163,19 @@ Ember runs games at close to full speed, and the speed is *measured* — read of
 
 A lot of work has been done since the first demo, leaving this as the version many were waiting for. This is not complete, expect some bugs and titles with mediocre performance. Please be patient as these are worked out.
 
-- **Sound.** Music, effects and CD/XA audio all play. There may be stutter or bugs still being worked out.
+- **Sound.** Music, effects, XA audio and CD audio tracks all play. Sound has had a big round of accuracy work: missing or wrong sound effects, music that sometimes played wrong, and reverb-driven music (Vib-Ribbon, Um Jammer Lammy) are all fixed. A few bugs remain.
 - **Memory cards.** Saves persist, two card slots, made automatically per game — and games can share a card if you want them to. *See [Memory cards](#memory-cards).*
-- **Controller support.** Analog sticks and rumble. Digital pads work as they always did.
+- **Controller support.** Analog sticks and rumble, including after switching analog mode or re-plugging a pad. Digital pads work as they always did, and digital-only games can be played on the stick. *See [Settings](#settings).*
 - **PAL games run.** PAL titles play on an NTSC signal with the picture correctly positioned, rather than cropped or shifted.
-- **240p or 480i output**, your choice — see Settings above.
+- **240p, 480i or 480p output**, plus optional 24-bit shading. See [Settings](#settings).
 
 ---
 
 ## Known bugs
 
-- **Some games hang.** Crash Team Racing wedges partway in, and King's Field II shows the same fault — both are the same underlying issue with how a CD command finishes, so one fix should cover both. There are certainly others reported as well.
+- **Some games may still hang.** Many hangs have been fixed since the first release (Doom and Twisted Metal among them), but there are certainly others still out there.
 - **FMV audio quirks.** Full-motion videos run quite smooth, however some FMVs may have an audio stutter. This is being worked out, please be patient.
-- **Audio delivery.** Some games do not have perfect or smooth audio. There are a few known bugs, and adjustments that need to be made. If a game is underperforming, the audio will have stutter.
-- **Spyro 2's dialogue stutters** word by word. Isolated to that game so far.
+- **Audio.** A few games still have small sound bugs (for example, Um Jammer Lammy is missing a sound effect when you hit notes). If a game is underperforming, the audio will stutter.
 - **Assorted visual glitches.** Most visual bugs have been fixed, however a few remain. Please be patient as these are worked out.
 
 If you hit something that isn't on this list, please share! This helps speed up development. Fixes are rarely per-game — each one found tends to improve compatibility across the whole library.
@@ -158,21 +184,17 @@ If you hit something that isn't on this list, please share! This helps speed up 
 
 ## How it hits these speeds
 
-- **Register pinning (near-identity mapping).** The PS1's CPU registers are mapped one-to-one onto the *same-numbered* EE registers during execution (POPS-style). A guest add on `$4` is just an EE add on `$4` — no loading state in and out around every instruction. The PS1's full hot CPU state also lives at a fixed address in the EE's fast on-chip scratchpad, reachable in a single instruction, so no register is wasted just pointing at it.
+The PS2 and PS1 are close cousins, and Ember leans on that family resemblance everywhere it can. Instead of pretending to be a generic computer, it treats the PS2 as what it is: the PS1's bigger sibling.
 
-- **JIT compilation.** Instead of decoding each PS1 instruction every time it runs, Ember translates a block of PS1 code into native EE machine code once, caches it, and re-runs the compiled version. Hot paths get translated as longer traces so the CPU spends its time running code, not re-deciding what to run.
+- **Recompiling, not interpreting.** PS1 code is translated into native PS2 code the first time it runs, then reused. The PS2 mostly runs the game directly instead of re-reading every instruction.
 
-- **Fastmem (hardware-assisted memory).** The EE's memory-mapping hardware (TLB) is wired so that PS1 RAM, BIOS, and scratchpad addresses land directly on real memory. A PS1 load or store becomes an ordinary EE load or store — no software bounds-check, no lookup. A big recent win extended this to the PS1's own scratchpad, which games hammer constantly; routing it through the fast path instead of a slow fallback cut execution by a third.
+- **Real hardware doing real work.** Wherever the PS2 has a part that can do a PS1 job natively (memory, graphics, sound), Ember hands the job to that part rather than simulating it in software. That's where most of the speed comes from.
 
-- **GTE in EE integer math (MMI).** The PS1's geometry/lighting co-processor is fixed-point integer with saturation and status flags that games read back. Ember runs it as native integer routines on the EE — using its wide MMI (multimedia/SIMD) instructions — rather than on the PS2's floating-point VU0. This is a deliberate accuracy choice: the GTE's math needs more precision than VU0 floats can hold exactly, so doing it in EE integer keeps results **bit-exact by construction** instead of approximated.
+- **Doing things only when they're due.** The CD drive, timers and other chips are only looked at when they actually have something to do, not constantly checked in the background.
 
-- **Event scheduler.** Timers, the CD drive, DMA, and interrupts each register when they're *next due* to do something, instead of being checked on every single instruction. The CPU only stops to service a device at the moment that device actually needs it.
+- **Exact where it matters.** The PS1's 3D math is reproduced exactly, down to the rounding quirks games depend on, rather than approximated for speed.
 
-- **Self-modifying-code tracking.** Compiled code is only thrown out and re-translated when a game actually writes over code it already ran — so the common case (code that doesn't change) never pays for the rare case (code that does).
-
-- **Async disc prefetch.** The emulator reads ahead of what the game is currently asking for, so gameplay doesn't stall waiting on the CD.
-
-- **GPU-to-GS translation.** The PS1's 2D command-list GPU calls are rebuilt as Graphics Synthesizer draw calls, handling PS1-specific texture, palette, and interlace quirks explicitly.
+- **Measured, not guessed.** Every speed change is timed on a real console with the PS2's own performance counters. If it doesn't make a measurable difference, it doesn't ship.
 
 ---
 
@@ -194,10 +216,9 @@ I also owe credit to everyone who has helped with concepts & knowledge regarding
 
 ## Source Code!?!?
 
-Ember is **closed source for now**, and this is a deliberate, temporary decision.
+Ember is **closed source for now**.
 
-The source will be released once the project hits a set of milestones I've laid
-out for myself. This project has a high personal meaning to me, and I'd like to see through that vision at this moment.
+I'm updating this section just for full transparency. This has been a huge personal project for me, and it has come with a great amount of effort. There is a set design I have in mind and want to ensure that this vision is finished out. I understand there is great interest in the code and design of this project, however I will be keeping this closed source for some time to come. I may at Ember's end of life / development release the source, as I believe it is great to allow this scene to always continue forward & preserve gameplay (why I started this in the first place). However once again the personal meaning of this project has been huge for me, and this has grown more with the continued time and effort placed into development. I personally do not want to see the results go all over the place, or the original efforts disregarded by many variants or forks after any initial release.
 
 ---
 

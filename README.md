@@ -89,6 +89,9 @@ The file is completely optional — delete it and every default stands. Keys Emb
 | `display` | `480` *(default)* | 480i. What almost every TV, capture device and upscaler expects. |
 | | `240` | True 240p "double strike" — what a CRT actually wants, and sharper on one. Some TVs and scalers refuse to lock to it. |
 | | `480p` | Progressive 480p. **Component or an HDMI adapter only**, composite shows no picture. |
+| `timing` | `auto` *(default)* | Follows the disc's region. PAL discs run at their own 50 Hz speed with a real 50 Hz PAL picture (288p, 576i or 576p, per `display`), so the whole image is shown instead of squeezed. Other discs run at 60 Hz. |
+| | `ntsc` | Always 60 Hz. Use this if your TV or capture device shows no picture for PAL discs (some older 60 Hz-only sets). PAL games will run faster than intended. |
+| | `pal` | Always 50 Hz. |
 | `dither` | `on` *(default)* | The PS1's own dithering, as the games were made to look. |
 | | `off` | Smooth shading without the dither pattern. |
 | `shading` | `15` *(default)* | The PS1's native 15-bit colour. |
@@ -99,7 +102,7 @@ The file is completely optional — delete it and every default stands. Keys Emb
 
 ### Per-game settings
 
-A `settings.txt` inside a game's own folder overrides the main one for that game. Only `controller` and `shading` are read there, since `display` and `dither` stay one setting for the whole console. For example, put `controller: d2a` in an old digital-only game's folder, and leave everything else alone.
+A `settings.txt` inside a game's own folder overrides the main one for that game. Only `controller`, `shading`, `timing` and `dither` are read there, since `display` stays one setting for the whole console. For example, put `controller: d2a` in an old digital-only game's folder, and leave everything else alone.
 
 It is recommended to set controller settings per game instead of general. If you put your controller on analog and a game does not support it, you will have to toggle it off or the game may not read input. Similar for D2A (digital 2 analog), you will lose analog functionality in games that have it.
 
@@ -167,7 +170,7 @@ A lot of work has been done since the first demo, leaving this as the version ma
 - **Memory cards.** Saves persist, two card slots, made automatically per game — and games can share a card if you want them to. *See [Memory cards](#memory-cards).*
 - **Controller support.** Analog sticks and rumble, including after switching analog mode or re-plugging a pad. Digital pads work as they always did, and digital-only games can be played on the stick. *See [Settings](#settings).*
 - **PAL games run.** PAL titles play on an NTSC signal with the picture correctly positioned, rather than cropped or shifted.
-- **240p, 480i or 480p output**, plus optional 24-bit shading. See [Settings](#settings).
+- **240p, 480i or 480p output**, plus optional 24-bit shading. PAL discs run at their own 50 Hz with a full PAL picture (288p, 576i or 576p). See [Settings](#settings).
 
 ---
 

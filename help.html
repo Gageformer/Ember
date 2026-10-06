@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help — Ember</title>
+  <meta name="description" content="Ember not working? Common problems and how to fix them.">
+  <meta name="theme-color" content="#090b13">
+  <link rel="icon" href="favicon.png?v=7" type="image/png">
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="logo.png?v=7" alt="" width="20" height="27">Ember</a>
+    <nav class="nav">
+      <a href="index.html">About</a>
+      <a href="download.html">Download</a>
+      <a href="resources.html">Resources</a>
+      <a class="here" href="help.html">Help</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head">
+    <p class="label">Help</p>
+    <h1>Not working?</h1>
+    <p class="lead">Find your problem below. Most fixes take one minute.</p>
+  </div>
+
+  <section>
+    <p class="label">Starting a game</p>
+    <h2>It will not start</h2>
+
+    <div class="fix">
+      <h3>I see the PS1 menu, not my game</h3>
+      <p>This is the most common problem. There are two usual reasons.</p>
+
+      <p><b>1. You started <code>ember.elf</code>.</b></p>
+      <p>On its own, <code>ember.elf</code> does not know which game to play. Start <code>launcher.elf</code> instead, or use another <a href="resources.html">launcher</a>.</p>
+
+      <p><b>2. You renamed the game files.</b></p>
+      <p>A <code>.cue</code> file has the name of its <code>.bin</code> file written inside it. If you rename the files, the name inside is now wrong.</p>
+      <p>Open the <code>.cue</code> in Notepad and make the name match:</p>
+<pre><span class="dim">wrong, this is the old name</span>
+FILE "Spyro (USA).bin" BINARY
+
+<span class="dim">right, same as the file</span>
+FILE "Spyro.bin" BINARY</pre>
+
+      <p class="muted small">Also check that each game has its own folder inside <code>games</code>.</p>
+    </div>
+
+    <div class="fix">
+      <h3>Black screen</h3>
+      <ul class="ticks">
+        <li>Your BIOS file must be named exactly <code>bios.bin</code> and sit next to <code>ember.elf</code>.</li>
+        <li>If you set <code>display: 480p</code>, you may need a component cable or HDMI adapter. If not, change it to <code>display: 480</code>.</li>
+        <li>If you set <code>display: 240</code>, some TVs can't show it. Change it to <code>display: 480</code>.</li>
+        <li>Using your own launcher? It must not reset the IOP before it starts Ember.</li>
+      </ul>
+    </div>
+
+    <div class="fix">
+      <h3>The launcher shows no games</h3>
+      <p>The launcher that comes with Ember only works from USB. For HDD, MMCE or other storage, use one of the <a href="resources.html">other launchers</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">While playing</p>
+    <h2>Something is wrong in the game</h2>
+
+    <div class="fix">
+      <h3>The controller does nothing</h3>
+      <p>Analog mode is on, but the game does not support it. Press the ANALOG button to turn it off.</p>
+    </div>
+
+    <div class="fix">
+      <h3>The analog stick does not work</h3>
+      <p>Press the ANALOG button first. Some games support analog but do not turn it on by themselves.</p>
+      <p>To have it on every time, add <code>controller: analog</code> to that game's <a href="#settings">settings</a>.</p>
+      <p class="muted small">Old game with no analog at all? Use <code>controller: d2a</code>. The left stick will act as the d-pad.</p>
+    </div>
+
+    <div class="fix">
+      <h3>The sound stutters</h3>
+      <p>This is a known bug. A fix is coming in the next version.</p>
+    </div>
+
+    <div class="fix">
+      <h3>The game freezes</h3>
+      <p>Some games still do this. Please <a href="https://github.com/Gageformer/Ember/issues">report it</a> so it can be fixed.</p>
+    </div>
+
+    <div class="fix">
+      <h3>Where are my saves?</h3>
+      <p>In the game's folder, as <code>MC1.vmc</code> and <code>MC2.vmc</code>. To back up a game, copy its folder.</p>
+    </div>
+  </section>
+
+  <div class="dither"></div>
+
+  <section id="settings">
+    <p class="label">Settings</p>
+    <h2>How to change a setting</h2>
+    <p>Make a text file called <code>settings.txt</code> next to <code>ember.elf</code>. Write one setting on each line.</p>
+<pre>display: 480
+controller: auto</pre>
+    <p class="muted small">Want a setting for one game only? Put a <code>settings.txt</code> in that game's folder. All settings work there except <code>display</code>.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Setting</th><th>Options</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>display</code></td><td><b>480</b>, 240, 480p</td><td>Video mode. 480 works on almost every TV. 240 is best on a CRT.</td></tr>
+          <tr><td><code>timing</code></td><td><b>auto</b>, ntsc, pal</td><td>The game's speed clock. Auto follows the game's region.</td></tr>
+          <tr><td><code>controller</code></td><td><b>auto</b>, analog, d2a</td><td>How the pad starts. Best set for each game.</td></tr>
+          <tr><td><code>dither</code></td><td><b>on</b>, off</td><td>The PS1 dot pattern. On is native, off may look smoother.</td></tr>
+          <tr><td><code>shading</code></td><td><b>15</b>, 24</td><td>24 gives smoother colour. Some games utilize the quirks of 15-bit.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">The option in <b>bold</b> is the normal one. To go back to normal, delete the line or the file.</p>
+  </section>
+
+  <section>
+    <p class="label">Still stuck</p>
+    <h2>Tell me about it</h2>
+    <p>Open a report on GitHub. Please say:</p>
+    <ul class="ticks">
+      <li>The game and its region (USA, Europe, Japan).</li>
+      <li>Your PS2 model and how you start Ember.</li>
+      <li>What happened, and when.</li>
+    </ul>
+    <div class="btns">
+      <a class="btn go" href="https://github.com/Gageformer/Ember/issues">Report a problem</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div>
+      <p>Ember by Gageformer. © 2026.</p>
+      <p>No BIOS or games included. You bring your own.</p>
+    </div>
+    <div class="hints">
+      <a href="download.html"><svg class="pad" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#6ea8ff" stroke-width="2" fill="none"/></svg>Download</a>
+      <a href="#"><svg class="pad" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2l5.5 10h-11z" stroke="#3fd6a0" stroke-width="2" fill="none"/></svg>Top</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

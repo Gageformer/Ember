@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resources — Ember</title>
+  <meta name="description" content="Apps and tools that work with Ember.">
+  <meta name="theme-color" content="#090b13">
+  <link rel="icon" href="favicon.png?v=7" type="image/png">
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="logo.png?v=7" alt="" width="20" height="27">Ember</a>
+    <nav class="nav">
+      <a href="index.html">About</a>
+      <a href="download.html">Download</a>
+      <a class="here" href="resources.html">Resources</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head">
+    <p class="label">Resources</p>
+    <h1>Apps and tools</h1>
+    <p class="lead">Launchers and apps that work with Ember.</p>
+  </div>
+
+  <!-- To add a link: copy one <a class="card ..."> block and change the text.
+       The letter after "card" picks the colour: t, c, x or s. -->
+
+  <section>
+    <p class="label">Start your games</p>
+    <h2>Launchers</h2>
+    <div class="grid">
+      <a class="card t" href="https://github.com/NathanNeurotic/launcHER">
+        <h3>launcHER</h3>
+        <p>Made just for Ember. Starts it from USB, HDD and other storage.</p>
+        <p class="label">by NathanNeurotic</p>
+      </a>
+      <a class="card c" href="https://github.com/NathanNeurotic/Open-PS2-Loader">
+        <h3>RiptOPL</h3>
+        <p>A version of OPL with Ember built in, with settings menus for each game.</p>
+        <p class="label">by NathanNeurotic</p>
+      </a>
+    </div>
+    <p class="muted small">These can be used in place of the <code>launcher.elf</code> that comes with Ember.</p>
+  </section>
+
+  <section>
+    <p class="label">On your PC</p>
+    <h2>Other apps</h2>
+    <p>Apps that help with Ember, like converting games or sorting folders.</p>
+    <!-- When an app comes out, replace the "empty" box with a grid of cards:
+    <div class="grid">
+      <a class="card x" href="https://example.com">
+        <h3>App name</h3>
+        <p>What it does, in one line.</p>
+        <p class="label">by someone</p>
+      </a>
+    </div>
+    -->
+    <p class="empty">Nothing here yet. New apps will show up here.</p>
+  </section>
+
+  <div class="dither"></div>
+
+  <section>
+    <p class="label">For developers</p>
+    <h2>Make your own launcher</h2>
+    <p>Any app that can start an ELF with an argument can start Ember. The argument is the game's folder name.</p>
+<pre>ember.elf Spyro                      <span class="dim">plays games/Spyro/</span>
+ember.elf "Crash Bandicoot (USA)"    <span class="dim">spaces are fine</span>
+ember.elf "Spyro/Spyro.cue"          <span class="dim">pick one file</span></pre>
+    <ul class="ticks">
+      <li>Pass the full path to <code>ember.elf</code> as the first argument.</li>
+      <li>Do not reset the IOP. Ember uses the storage drivers your app already loaded.</li>
+      <li>No permission needed. Just keep the credit.</li>
+    </ul>
+    <p class="muted small">More detail is in the <a href="https://github.com/Gageformer/Ember#launching-ember-from-homebrew">README</a>. Made something? <a href="https://github.com/Gageformer/Ember/issues">Tell me</a> and I'll add it here.</p>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div>
+      <p>Ember by Gageformer. © 2026.</p>
+      <p>No BIOS or games included. You bring your own.</p>
+    </div>
+    <div class="hints">
+      <a href="download.html"><svg class="pad" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#6ea8ff" stroke-width="2" fill="none"/></svg>Download</a>
+      <a href="#"><svg class="pad" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2l5.5 10h-11z" stroke="#3fd6a0" stroke-width="2" fill="none"/></svg>Top</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

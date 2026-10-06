@@ -1,0 +1,19 @@
+# Only the files the live site needs are uploaded.
+# Everything else in this folder stays on this PC.
+/*
+
+# the four pages
+!/index.html
+!/download.html
+!/resources.html
+!/help.html
+
+# what the pages load
+!/style.css
+!/main.js
+!/logo.png
+!/favicon.png
+
+# housekeeping
+!/.nojekyll
+!/.gitignore

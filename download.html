@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Download — Ember</title>
+  <meta name="description" content="Download Ember and set it up on your PS2 in five steps.">
+  <meta name="theme-color" content="#090b13">
+  <link rel="icon" href="favicon.png?v=7" type="image/png">
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="logo.png?v=7" alt="" width="20" height="27">Ember</a>
+    <nav class="nav">
+      <a href="index.html">About</a>
+      <a class="here" href="download.html">Download</a>
+      <a href="resources.html">Resources</a>
+      <a href="help.html">Help</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head">
+    <p class="label">Download</p>
+    <h1>Get Ember</h1>
+  </div>
+
+  <section>
+    <div class="release">
+      <p class="label">Newest version · <span data-release-date>September 26, 2026</span></p>
+      <h2 data-release-name>Ember Beta 2</h2>
+      <div class="btns">
+        <a class="btn go" href="https://github.com/Gageformer/Ember/releases/latest/download/ember.elf">ember.elf</a>
+        <a class="btn" href="https://github.com/Gageformer/Ember/releases/latest/download/launcher.elf">launcher.elf</a>
+      </div>
+      <p class="muted small"><b>ember.elf</b> is the emulator. <b>launcher.elf</b> is a small game menu. It is optional and works from USB only.</p>
+      <p class="small"><a href="https://github.com/Gageformer/Ember/releases">What's new, and older versions</a></p>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">Before you start</p>
+    <h2>You need</h2>
+    <ul class="ticks">
+      <li>A PS2 that can run homebrew.</li>
+      <li>A USB stick. Other storage like MMCE or HDD works too.</li>
+      <li>A PS1 BIOS file from your own console, named <code>bios.bin</code>. Ember does not include one.</li>
+      <li>Your games as <code>.cue</code> and <code>.bin</code> files.</li>
+    </ul>
+  </section>
+
+  <div class="dither"></div>
+
+  <section>
+    <p class="label">Setup</p>
+    <h2>Five steps</h2>
+    <ol class="steps">
+      <li>
+        <h3>Make a folder</h3>
+        <p>On your USB stick, make a folder called <code>Ember</code>.</p>
+      </li>
+      <li>
+        <h3>Add Ember</h3>
+        <p>Put <code>ember.elf</code> and <code>launcher.elf</code> inside.</p>
+      </li>
+      <li>
+        <h3>Add your BIOS</h3>
+        <p>Put <code>bios.bin</code> in the same folder.</p>
+        <p class="muted small">The name must be exactly <code>bios.bin</code>. Rename your file if it is called something else.</p>
+      </li>
+      <li>
+        <h3>Add your games</h3>
+        <p>Make a <code>games</code> folder. Inside it, make one folder for each game. Name them how you like.</p>
+      </li>
+      <li>
+        <h3>Play</h3>
+        <p>Plug the stick into your PS2 and start <code>launcher.elf</code> from your homebrew app. Pick a game.</p>
+        <p class="muted small">Start <code>launcher.elf</code>, not <code>ember.elf</code>. Starting <code>ember.elf</code> only shows the PS1 menu.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <p class="label">Check</p>
+    <h2>It should look like this</h2>
+<pre>Ember/
+├── ember.elf
+├── launcher.elf
+├── bios.bin              <span class="dim">you add this</span>
+└── games/
+    ├── Spyro/
+    │   ├── Spyro.cue
+    │   └── Spyro.bin
+    └── Crash Bandicoot/
+        ├── Crash Bandicoot.cue
+        └── Crash Bandicoot.bin</pre>
+    <p class="muted small">Saves show up later as <code>MC1.vmc</code> and <code>MC2.vmc</code> inside each game folder. Ember makes them for you.</p>
+  </section>
+
+  <section>
+    <div class="grid">
+      <a class="card" href="resources.html">
+        <h3>Not using USB?</h3>
+        <p>Other launchers can start Ember from HDD, MMCE and more.</p>
+      </a>
+      <a class="card" href="help.html">
+        <h3>Not working?</h3>
+        <p>Black screen, no sound, no games. Fixes are here.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div>
+      <p>Ember by Gageformer. © 2026.</p>
+      <p>No BIOS or games included. You bring your own.</p>
+    </div>
+    <div class="hints">
+      <a href="help.html"><svg class="pad" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="#ff5d6c" stroke-width="2" fill="none"/></svg>Help</a>
+      <a href="#"><svg class="pad" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2l5.5 10h-11z" stroke="#3fd6a0" stroke-width="2" fill="none"/></svg>Top</a>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -172,6 +172,9 @@ section > .label + h2 { margin-top: 10px; }
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
+/* fewer, wider columns for cards with more text */
+.grid.wide { grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -179,6 +182,10 @@ section > .label + h2 { margin-top: 10px; }
 }
 .card > * + * { margin-top: 8px; }
 .card p { color: #b4bacd; font-size: 16px; }
+
+/* a closing statement under a row of cards */
+.card.accent { border-left: 3px solid var(--ember); }
+.grid + .card.accent { margin-top: 14px; }
 
 /* coloured top edge, one per pad button */
 .card.t { border-top: 3px solid var(--tri); }

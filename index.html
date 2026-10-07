@@ -7,7 +7,7 @@
   <meta name="description" content="Ember is a PS1 emulator that runs on the PS2. Put it on your device of choice, add your games, and play.">
   <meta name="theme-color" content="#090b13">
   <link rel="icon" href="favicon.png?v=7" type="image/png">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -55,8 +55,8 @@
         <p>Memory cards are made for you, two per game. Nothing to set up.</p>
       </div>
       <div class="card s">
-        <h3>Feels right</h3>
-        <p>The native experience: analog sticks, rumble, and 240p, 480i or 480p video.</p>
+        <h3>A native experience</h3>
+        <p>Analog sticks, rumble, no latency, and 240p, 480i or 480p video.</p>
       </div>
     </div>
   </section>
@@ -106,19 +106,26 @@
     <p class="label">How it works</p>
     <h2>Why it is fast</h2>
     <p>The PS2 shares many similarities with the PS1. Ember utilizes that.</p>
-    <div class="grid">
+    <div class="grid wide">
       <div class="card">
         <h3>It translates</h3>
         <p>PS1 code is compiled directly into PS2 code.</p>
+        <p>Both consoles use MIPS processors, so the JIT has very little to convert. Each block is compiled once, then reused.</p>
       </div>
       <div class="card">
-        <h3>It uses real parts</h3>
+        <h3>Hardware accelerated</h3>
         <p>Graphics, sound and memory inline to the PS2's own hardware where it can.</p>
+        <p>The PS2's graphics and sound chips do that work natively, leaving the main CPU free for the game.</p>
       </div>
       <div class="card">
-        <h3>It stays exact</h3>
-        <p>The PS1's 3D math is copied exactly, so games look the way they should.</p>
+        <h3>Direct memory</h3>
+        <p>The PS1's memory map is laid onto the PS2's own memory manager, the MMU.</p>
+        <p>A PS1 read or write runs as a native PS2 one, with no software lookup in between. The PS1's mirrored memory regions come from the same mapping.</p>
       </div>
+    </div>
+    <div class="card accent">
+      <h3>And it still stays exact</h3>
+      <p>None of this trades accuracy for speed. The PS1's 3D math is reproduced exactly, down to the rounding quirks games depend on, so games look the way they should.</p>
     </div>
   </section>
 

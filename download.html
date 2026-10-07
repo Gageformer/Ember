@@ -7,7 +7,7 @@
   <meta name="description" content="Download Ember and set it up on your PS2 in five steps.">
   <meta name="theme-color" content="#090b13">
   <link rel="icon" href="favicon.png?v=7" type="image/png">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -35,12 +35,13 @@
       <p class="label">Newest version · <span data-release-date>September 26, 2026</span></p>
       <h2 data-release-name>Ember Beta 2</h2>
       <div class="btns">
-        <a class="btn go" href="https://github.com/Gageformer/Ember/releases/latest/download/ember.elf">ember.elf</a>
-        <a class="btn" href="https://github.com/Gageformer/Ember/releases/latest/download/launcher.elf">launcher.elf</a>
+        <a class="btn go" data-dl="ember.elf" href="https://github.com/Gageformer/Ember/releases/download/Beta-2/ember.elf">ember.elf</a>
+        <a class="btn" data-dl="launcher.elf" href="https://github.com/Gageformer/Ember/releases/download/Launcher/launcher.elf">launcher.elf</a>
       </div>
-      <p class="muted small"><b>ember.elf</b> is the emulator. <b>launcher.elf</b> is a small game menu. It is optional and works from USB only.</p>
+      <p class="muted small"><b>ember.elf</b> is the emulator. <b>launcher.elf</b> is a small game menu. It is optional and works from any device.</p>
       <p class="small"><a href="https://github.com/Gageformer/Ember/releases">What's new, and older versions</a></p>
     </div>
+    <p class="muted small">Enjoy Ember? <a href="https://ko-fi.com/gageformer">Donate here</a>.</p>
   </section>
 
   <section>
@@ -62,7 +63,7 @@
     <ol class="steps">
       <li>
         <h3>Make a folder</h3>
-        <p>On your USB stick, make a folder called <code>Ember</code>.</p>
+        <p>On your USB stick, make a folder called <code>EMBER</code>.</p>
       </li>
       <li>
         <h3>Add Ember</h3>
@@ -88,7 +89,7 @@
   <section>
     <p class="label">Check</p>
     <h2>It should look like this</h2>
-<pre>Ember/
+<pre>EMBER/
 ├── ember.elf
 ├── launcher.elf
 ├── bios.bin              <span class="dim">you add this</span>
@@ -102,11 +103,22 @@
     <p class="muted small">Saves show up later as <code>MC1.vmc</code> and <code>MC2.vmc</code> inside each game folder. Ember makes them for you.</p>
   </section>
 
+  <section id="launcher">
+    <p class="label">The launcher</p>
+    <h2>Launcher in a different place?</h2>
+    <p>Next to <code>ember.elf</code>, the launcher needs no setup. It works from USB, MMCE, MX4SIO or HDD.</p>
+    <p>Keeping it somewhere else? Put <a data-dl="ember-launcher.cfg" href="https://github.com/Gageformer/Ember/releases/download/Launcher/ember-launcher.cfg">ember-launcher.cfg</a> beside the launcher. Open it in a text editor and remove the <code>#</code> from the line for your device.</p>
+<pre>ember=mass:/EMBER/        <span class="dim">USB</span>
+ember=mmce?:/EMBER/       <span class="dim">MMCE</span>
+ember=ata:/EMBER/         <span class="dim">internal HDD, exFAT</span></pre>
+    <p class="muted small">The line points at the folder that holds <code>ember.elf</code>. Keep that folder named <code>EMBER</code>, so every launcher knows where to look.</p>
+  </section>
+
   <section>
     <div class="grid">
       <a class="card" href="resources.html">
-        <h3>Not using USB?</h3>
-        <p>Other launchers can start Ember from HDD, MMCE and more.</p>
+        <h3>Want another launcher?</h3>
+        <p>Other apps can start Ember too.</p>
       </a>
       <a class="card" href="help.html">
         <h3>Not working?</h3>
@@ -130,6 +142,6 @@
   </div>
 </footer>
 
-<script src="main.js"></script>
+<script src="main.js?v=2"></script>
 </body>
 </html>

@@ -4,6 +4,8 @@
 
 Ember is a PS1 emulator that runs on the PS2 itself. You drop it onto a USB stick or storage device of choice, and add the `.cue`/`.bin` files for your games library. This can be launched from whatever homebrew you so choose, and it plays from there.
 
+**Current version: 0.8**
+
 [![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Ember-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/gageformer)
 
 ---
@@ -15,6 +17,7 @@ Ember is a single executable program (`ember.elf`) along with the games you want
 ```
 Ember/
 ├── ember.elf                       # the emulator
+├── LICENSE.txt                     # the licence, keep it with ember.elf
 ├── bios.bin                        # a PS1 BIOS — you supply this yourself
 ├── settings.txt                    # optional, see below
 └── games/
@@ -67,6 +70,20 @@ Things to know if you're wiring this up:
 
 If you're building a front-end and have any questions or need something specific, please ask.
 
+### The included launcher
+
+`launcher.elf` lists the folders in `games/` and starts the one you pick.
+
+- **Next to `ember.elf`** (the normal setup): nothing to configure. It works from whatever device the folder is on.
+- **Somewhere else** (an OPL APPS entry, a memory card, a different drive): put a file named `ember-launcher.cfg` beside the launcher with one line saying where the Ember folder is:
+
+  ```
+  ember=mass:/EMBER/
+  ```
+
+  Other devices: `ata:/EMBER/` (exFAT internal HDD), `hdd0:<partition>:pfs:/EMBER/` (APA/PFS HDD), `mmce?:/EMBER/`, `mx4sio:/EMBER/`, `ilink:/EMBER/`, `mc?:/EMBER/`, `udpbd:/EMBER/`, `udpfs:/EMBER/`. If `ember.elf` is beside the launcher the file is ignored. A ready-to-edit copy with every device listed ships with the launcher: [`ember-launcher.cfg`](launcher/ember-launcher.cfg).
+- **No config?** The launcher searches MMCE first, then USB, the exFAT internal HDD, MX4SIO, i.Link and memory cards for `EMBER/ember.elf` by itself. APA/PFS and network locations always need the config line.
+
 ---
 
 ## Settings
@@ -77,34 +94,124 @@ Next to `ember.elf` you can put an optional **`settings.txt`**. It's a plain tex
 # Lines starting with # or ; are ignored.
 # A space after the colon is optional.
 
-display: 480
+display: 480p
+controller: auto
+exit path: mass:/APPS/OPNPS2LD.ELF
 ```
 
-The file is completely optional — delete it and every default stands. Keys Ember doesn't recognise are simply skipped, so an older or newer settings file won't break anything.
+The file is completely optional — delete it and every default stands. Keys Ember doesn't recognise are simply skipped, so an older or newer settings file won't break anything. Defaults are marked *(default)* below.
 
-### Available keys
+### Picture
 
 | Key | Values | What it does |
 |---|---|---|
 | `display` | `480` *(default)* | 480i. What almost every TV, capture device and upscaler expects. |
-| | `240` | True 240p "double strike" — what a CRT actually wants, and sharper on one. Some TVs and scalers refuse to lock to it. |
-| | `480p` | Progressive 480p. **Component or an HDMI adapter only**, composite shows no picture. |
-| `timing` | `auto` *(default)* | Follows the disc's region. PAL discs run at their own 50 Hz speed with a real 50 Hz PAL picture (288p, 576i or 576p, per `display`), so the whole image is shown instead of squeezed. Other discs run at 60 Hz. |
-| | `ntsc` | Always 60 Hz. Use this if your TV or capture device shows no picture for PAL discs (some older 60 Hz-only sets). PAL games will run faster than intended. |
-| | `pal` | Always 50 Hz. |
+| | `240` | True 240p — what a CRT actually wants, and sharper on one. Some TVs and scalers refuse to lock to it. |
+| | `480p` | Progressive 480p. **Component or an HDMI adapter only**, composite shows no picture. Every game is shown at the PS1's own proportions. |
+| `deinterlace` | `blend` *(default)* | Only affects `display: 480p`. This is how the PS1's 480i screens are displayed in 480p; weaving creates combing. `blend` softens it creating a more fluid picture. |
+| | `weave` | Every line exactly as the game drew it, but moving things comb. |
+| `shading` | `15` *(default)* | The PS1's native 15-bit colour. The accurate choice. |
+| | `24` | Keeps colour at 24-bit, so gradients are smooth where the PS1 would band or dither. The game itself still sees a normal PS1 screen. |
+| | `24d` | `24`, darkened the way 15-bit colour would darken it. Designed for Silent Hill, where `24` makes dark scenes too clear and shows the draw distance in the Otherworld. |
 | `dither` | `on` *(default)* | The PS1's own dithering, as the games were made to look. |
 | | `off` | Smooth shading without the dither pattern. |
-| `shading` | `15` *(default)* | The PS1's native 15-bit colour. |
-| | `24` | Smoother gradients where the PS1 would band or dither. Experimental — if you want accuracy, stick with `15`. This is being redesigned for a future version, and may cause bugs or cost performance. |
-| `controller` | `auto` *(default)* | Behaves like a real DualShock: ANALOG button toggles. If a game requests ANALOG, it will automatically turn on. |
-| | `analog` | Starts with the ANALOG setting on, useful for games that support analog but do not request it. |
+
+With PAL timing (below), `240`, `480` and `480p` become 288p, 576i and 576p, so a PAL game's full picture is shown rather than squeezed.
+
+`24` and `24d` ask more of the console than `15`. If a game slows down with them, go back to `15`.
+
+### Timing
+
+| Key | Values | What it does |
+|---|---|---|
+| `timing` | `auto` *(default)* | Follows the disc's region. PAL discs run at their own 50 Hz speed with a real 50 Hz PAL picture. Other discs run at 60 Hz. |
+| | `ntsc` | Always 60 Hz. Use this if your TV or capture device shows no picture for PAL discs (some older 60 Hz-only sets). PAL games will run faster than intended. |
+| | `pal` | Always 50 Hz. |
+
+### Controller
+
+| Key | Values | What it does |
+|---|---|---|
+| `controller` | `auto` *(default)* | Behaves like a real DualShock: starts with ANALOG off, and the game or the ANALOG button turns it on. |
+| | `analog` | Starts with ANALOG on, for games that support the sticks but don't turn analog on themselves. The button still toggles. |
 | | `d2a` | For games with **no** analog support: the left stick works as the d-pad. Don't use this on analog games, it will break native analog functionality. |
+
+### Menu and system
+
+| Key | Values | What it does |
+|---|---|---|
+| `menu` | `on` *(default)* | The Ember menu is available in game. See [The Ember menu](#the-ember-menu). |
+| | `off` | No menu. Its button combination goes to the game instead. |
+| `exit path` | *(empty, default)* | **Exit Game** in the menu returns to the PS2 browser. |
+| | a full path to an ELF | **Exit Game** starts that program instead, e.g. `mass:/APPS/OPNPS2LD.ELF` or `mc0:/BOOT/BOOT.ELF`. Memory card paths are case-sensitive. If the file can't be read, you go to the browser. |
+| `debug` | `off` *(default)* | Nothing is shown on screen while Ember starts. |
+| | `on` | The start-up log is shown on the TV. Useful when reporting a problem. |
 
 ### Per-game settings
 
-A `settings.txt` inside a game's own folder overrides the main one for that game. Only `controller`, `shading`, `timing` and `dither` are read there, since `display` stays one setting for the whole console. For example, put `controller: d2a` in an old digital-only game's folder, and leave everything else alone.
+A `settings.txt` inside a game's own folder overrides the main one for that game. `controller`, `shading`, `timing`, `dither`, and `deinterlace` are read there. `display`, `menu`, `exit path` and `debug` stay one setting for the whole console. For example, put `controller: d2a` in an old digital-only game's folder, and leave everything else alone.
 
 It is recommended to set controller settings per game instead of general. If you put your controller on analog and a game does not support it, you will have to toggle it off or the game may not read input. Similar for D2A (digital 2 analog), you will lose analog functionality in games that have it.
+
+---
+
+## The Ember menu
+
+Hold **L1 + L2 + R1 + R2 + SELECT + START** during a game to open the Ember menu. The game pauses while it is open.
+
+- **Resume Game** — back to the game.
+- **Disc Control** — change discs in a multi-disc game. *See [Multi-disc games](#multi-disc-games).*
+- **Cheats Manager** — switch cheats on and off. *See [Cheats](#cheats).*
+- **System** — **Reset Game**, **Exit Game** (to the PS2 browser, or the program set by `exit path`), or **Power Off**.
+
+Disc Control and Cheats Manager are dimmed for games that don't have a disc list or a cheat file.
+
+### Multi-disc games
+
+Keep every disc in one game folder, and add a **`Discs.txt`** listing the disc files in order, one per line:
+
+```
+games/
+└── Final Fantasy VII/
+    ├── Discs.txt
+    ├── Final Fantasy VII (Disc 1).cue
+    ├── Final Fantasy VII (Disc 2).cue
+    └── Final Fantasy VII (Disc 3).cue
+```
+
+```
+Final Fantasy VII (Disc 1).cue
+Final Fantasy VII (Disc 2).cue
+Final Fantasy VII (Disc 3).cue
+```
+
+The game boots disc 1. When it asks for the next disc, open the menu and pick it in **Disc Control**. All discs share the folder, so they share the same memory cards.
+
+### Cheats
+
+Put a **`Cheats.txt`** in a game's folder. Each cheat is a name in brackets followed by its GameShark codes, one per line:
+
+```
+[Infinite Health]
+800A1234 0064
+
+[*Fly Mode]
+800110CC 5294
+```
+
+Cheats start off. Turn them on and off in **Cheats Manager**; the choice lasts until you leave the game. A cheat whose name starts with `*` is on from the moment the game boots. Switching a cheat off puts back what it changed.
+
+### Protected PAL games
+
+Some PAL games use LibCrypt copy protection and won't play correctly without its data. Put the game's `.sbi` (or `.lsd`) file beside its `.cue`, with the same name:
+
+```
+games/
+└── MediEvil/
+    ├── MediEvil (Europe).cue
+    ├── MediEvil (Europe).bin
+    └── MediEvil (Europe).sbi
+```
 
 ---
 
@@ -135,17 +242,19 @@ a game's folder, containing the name of the folder whose cards it should use:
 games/
 ├── Spyro/
 │   └── MC1.vmc              # the real cards live here
-└── Ripto/
+└── Riptos Rage/
     └── SharedMC.txt         # one line: Spyro
 ```
 
-Now Ripto reads and writes Spyro's cards instead of making its own.
+Now Riptos Rage reads and writes Spyro's cards instead of making its own.
+
+The named folder only has to exist inside `games/`. It doesn't need to be a game: an empty folder such as `games/Shared Cards/` works, and the cards are made there the first time.
 
 A few things that make this safe to play with:
 
 - **It's one hop.** A shared folder is never itself redirected, so you can't
   build a loop or a chain by accident.
-- **A typo can't cost you a game.** If the name doesn't point at a real game
+- **A typo can't cost you a game.** If the name doesn't point at a real
   folder, Ember quietly uses that game's own cards.
   Worst case you lose the sharing, never the save.
 - **It's just a folder name** — not a path. `Spyro`, not `games/Spyro`.
@@ -154,50 +263,54 @@ A few things that make this safe to play with:
 
 ## Where it stands today
 
-Ember runs most games at full speed, and the speed is *measured* — read off the PS2's own onboard performance counters while a game is running, rather than estimated or eyeballed.
+Ember runs most games at full speed, and this is backed by measurements in testing — read off PS2 performance counters while a game is running.
 
 - **Spyro & Crash run at full speed** — locked 30fps with room to spare. These were my first two games heavily tested and developed with.
-- **Resident Evil 2 and Silent Hill are playable** and sit right around the real-time line. They have randomly dipped under it in the heaviest scenes. Recent work may have fixed this.
-- **Many more titles have been tested since the first release.** Crash Team Racing, Ridge Racer Type 4, Tomb Raider II, Spider-Man, MediEvil, Breath of Fire III and others have all had performance and compatibility work, and most now run at or near full speed. The heaviest scenes in some games can still dip. There's more perf work to come, and Ember only gets better from here.
+- **Resident Evil 2 and Silent Hill are playable** and run at or near full speed.
+- **Many more titles have been tested.** Crash Team Racing, Ridge Racer Type 4, Tomb Raider II, Spider-Man, MediEvil, Breath of Fire III and others have all had performance and compatibility work, and most now run at or near full speed. Since the last release, Final Fantasy VIII and IX, Metal Gear Solid and Tekken 3 have had fixes as well. The heaviest scenes in some games can still dip.
 
 ---
 
-## Current Release
+## What's new in 0.8
 
-A lot of work has been done since the first demo, leaving this as the version many were waiting for. This is not complete, expect some bugs and titles with mediocre performance. Please be patient as these are worked out.
+- **The Ember menu.** Pause any game to reset it, exit, power off, change discs or manage cheats. *See [The Ember menu](#the-ember-menu).*
+- **Multi-disc games.** Swap discs from the menu with a `Discs.txt` list.
+- **Cheats.** GameShark codes from a `Cheats.txt` per game, switched on and off in the menu.
+- **LibCrypt.** Protected PAL games play with their `.sbi` file.
+- **Better 480p.** Games keep the PS1's own proportions, and `deinterlace` handles the few games that combed.
+- **24-bit shading, redesigned.** `24` is reworked, and `24d` is added for dark games.
+- **Exit to any program.** `exit path` sends Exit Game to a launcher of your choice.
+- **A quiet start.** Ember no longer prints its start-up log on screen unless `debug: on` is set.
+- **Sound.** Movie audio in Final Fantasy VIII and IX, Metal Gear Solid's music and briefing voices, Um Jammer Lammy's effects and more are fixed.
+- **Fewer hangs and stalls.** Fixes for Tekken 3 freezing after a win, a minute-long load in Mortal Kombat Trilogy, and others.
+- **New licence.** Ember 0.8 is released under the Ember Licence 1.0. *See [License](#license).*
 
-- **Sound.** Music, effects, XA audio and CD audio tracks all play. Sound has had a big round of accuracy work: missing or wrong sound effects, music that sometimes played wrong, and reverb-driven music (Vib-Ribbon, Um Jammer Lammy) are all fixed. A few bugs remain.
-- **Memory cards.** Saves persist, two card slots, made automatically per game — and games can share a card if you want them to. *See [Memory cards](#memory-cards).*
-- **Controller support.** Analog sticks and rumble, including after switching analog mode or re-plugging a pad. Digital pads work as they always did, and digital-only games can be played on the stick. *See [Settings](#settings).*
-- **PAL games run.** PAL titles play on an NTSC signal with the picture correctly positioned, rather than cropped or shifted.
-- **240p, 480i or 480p output**, plus optional 24-bit shading. PAL discs run at their own 50 Hz with a full PAL picture (288p, 576i or 576p). See [Settings](#settings).
+This is not complete. There may still be some bugs and titles with mediocre performance. Please be patient as these are worked out.
 
 ---
 
 ## Known bugs
 
-- **Some games may still hang.** Many hangs have been fixed since the first release (Doom and Twisted Metal among them), but there are certainly others still out there.
-- **FMV audio quirks.** Full-motion videos run quite smooth, however some FMVs may have an audio stutter. This is being worked out, please be patient.
-- **Audio.** A few games still have small sound bugs (for example, Um Jammer Lammy is missing a sound effect when you hit notes). If a game is underperforming, the audio will stutter.
+- **Some games may still hang.** Many hangs have been fixed, but there are certainly others still out there.
+- **Some movies run slow.** A few full-motion videos (the initial Final Fantasy VIII intro, Blasto) still run below full speed.
+- **Audio.** A few games may still have small sound bugs. If a game is underperforming, the audio will stutter.
 - **Assorted visual glitches.** Most visual bugs have been fixed, however a few remain. Please be patient as these are worked out.
 
 If you hit something that isn't on this list, please share! This helps speed up development. Fixes are rarely per-game — each one found tends to improve compatibility across the whole library.
 
 ---
 
-## How it hits these speeds
+## Why it's fast
 
-The PS2 and PS1 are close cousins, and Ember leans on that family resemblance everywhere it can. Instead of pretending to be a generic computer, it treats the PS2 as what it is: the PS1's bigger sibling.
+The PS2 shares a lot with the PS1, and Ember is built around that.
 
-- **Recompiling, not interpreting.** PS1 code is translated into native PS2 code the first time it runs, then reused. The PS2 mostly runs the game directly instead of re-reading every instruction.
+- **It translates.** PS1 code is compiled directly into PS2 code. Both consoles use MIPS processors, so there is very little to convert. Each block of code is compiled once, then reused.
 
-- **Real hardware doing real work.** Wherever the PS2 has a part that can do a PS1 job natively (memory, graphics, sound), Ember hands the job to that part rather than simulating it in software. That's where most of the speed comes from.
+- **Hardware accelerated.** Graphics, sound and memory are handed to the PS2's own hardware wherever it can do the job. The PS2's graphics and sound chips do that work natively, leaving the main CPU free for the game.
 
-- **Doing things only when they're due.** The CD drive, timers and other chips are only looked at when they actually have something to do, not constantly checked in the background.
+- **Direct memory.** The PS1's memory map is laid onto the PS2's own memory manager. A PS1 read or write runs as a native PS2 one, with no software lookup in between, and the PS1's mirrored memory regions come from the same mapping.
 
-- **Exact where it matters.** The PS1's 3D math is reproduced exactly, down to the rounding quirks games depend on, rather than approximated for speed.
-
-- **Measured, not guessed.** Every speed change is timed on a real console with the PS2's own performance counters. If it doesn't make a measurable difference, it doesn't ship.
+- **It still stays exact.** None of this trades accuracy for speed. The PS1's 3D math is reproduced exactly, down to the rounding quirks games depend on, so games look the way they should.
 
 ---
 
@@ -212,8 +325,9 @@ This has been a personal project of mine I have worked on for a while. I am comp
 ## Thank You
 
 I'd like to give a personal thanks to a few people, as they have helped drastically with the development process.
-A huge thanks to **zackcage6** & **TwistedZeon**! for all of their help with personally testing & reporting issues.
-I also owe credit to everyone who has helped with concepts & knowledge regarding the PS2. I have a large background in software development, but there were many learning curves starting on PS2 development that I had to overcome. I appreciate the patience and hospitality of everyone involved.
+Thank you to **zackcage6**, **TwistedZeon**, **chane2k1** and **Peter8Franz** for their help with personally testing & reporting issues. There are many more supporters than just listed here, and even if you're not directly listed I do genuinely appreciate your help provided. I do not want a long list, but want to give some acknowledgement to some who have gone out of their way to help me out.
+
+I also owe credit to everyone who has helped with concepts & knowledge regarding the PS2. I have a large background in software development, but there were many learning curves starting on PS2 development that I had to overcome. **NathanNeurotic** was a huge help through this & phenomenal friend throughout the entire process. I appreciate the patience and hospitality of everyone involved.
 
 ---
 
@@ -227,8 +341,9 @@ I'm updating this section just for full transparency. This has been a huge perso
 
 ## License
 
-Ember beta builds are distributed under the **Ember Public Beta Testing
-Licence** — see [`LICENSE-BETA.txt`](LICENSE-BETA.txt).
+Ember 0.8 is distributed under the **Ember Licence, Version 1.0** — see
+[`LICENSE.txt`](LICENSE.txt). Earlier beta builds stay under the
+[Ember Public Beta Testing Licence](LICENSE-BETA.txt) they shipped with.
 
 In plain terms — **use it, share what you find, build on top of it. Just don't
 sell it, and don't take the credit.**
@@ -238,10 +353,11 @@ sell it, and don't take the credit.**
 - **Yes:** build a launcher or front-end for it. No permission needed, and
   honestly I'd love to see it.
 - **Yes:** include it in a homebrew collection or front-end release, as long as
-  it's unmodified, credited to me by name with a link back.
+  it's unmodified, comes with `LICENSE.txt`, and is credited to me by name with
+  a link back to the official release page.
 - **No:** selling it, putting it behind a paywall or link locker, or shipping it
   on preloaded cards or drives for money.
-- **No:** repackaging it, or presenting it as your own work.
+- **No:** modifying or repackaging it, or presenting it as your own work.
 
 Anything commercial, just ask. I'm easy-going about most things — the two I do
 care about are keeping credit where it belongs and nobody personally profiting off work

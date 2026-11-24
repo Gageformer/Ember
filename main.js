@@ -1,6 +1,6 @@
 // Keeps the download page pointed at the newest files.
-// Ember and its launcher are released separately, so each button looks for
-// the newest release that actually holds its file.
+// Each [data-dl] button looks for the newest release that actually holds its file.
+// The launcher links have no data-dl: they always point at the "Launcher" release.
 // If GitHub can't be reached, the links already in the page stay.
 (function () {
   var links = document.querySelectorAll("[data-dl]");

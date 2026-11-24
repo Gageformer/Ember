@@ -62,6 +62,7 @@ FILE "Spyro.bin" BINARY</pre>
         <li>If you set <code>display: 240</code>, some TVs can't show it. Change it to <code>display: 480</code>.</li>
         <li>Using your own launcher? It must not reset the IOP before it starts Ember.</li>
       </ul>
+      <p class="muted small">To see what Ember is doing, add <code>debug: on</code> to your <a href="#settings">settings</a>. The start-up log will show on the TV.</p>
     </div>
 
     <div class="fix">
@@ -89,7 +90,7 @@ FILE "Spyro.bin" BINARY</pre>
 
     <div class="fix">
       <h3>The sound stutters</h3>
-      <p>This is a known bug. A fix is coming in the next version.</p>
+      <p>This happens when a game runs slow. Please <a href="https://github.com/Gageformer/Ember/issues">report it</a> so it can be fixed.</p>
     </div>
 
     <div class="fix">
@@ -103,6 +104,29 @@ FILE "Spyro.bin" BINARY</pre>
     </div>
   </section>
 
+  <section id="menu">
+    <p class="label">Menu and extras</p>
+    <h2>The Ember menu</h2>
+    <p>Hold <b>L1 + L2 + R1 + R2 + SELECT + START</b> in a game. The game pauses, and you can reset, exit, power off, change discs or turn cheats on and off.</p>
+
+    <div class="fix">
+      <h3>How do I change discs?</h3>
+      <p>Put every disc in one game folder, and add a <code>Discs.txt</code> that lists the disc files in order. Then pick the next disc in <b>Disc Control</b>.</p>
+    </div>
+
+    <div class="fix">
+      <h3>How do I use cheats?</h3>
+      <p>Add a <code>Cheats.txt</code> with GameShark codes to the game's folder. Turn them on in <b>Cheats Manager</b>.</p>
+    </div>
+
+    <div class="fix">
+      <h3>A PAL game will not play right</h3>
+      <p>Some PAL games are copy protected. Put the game's <code>.sbi</code> file next to its <code>.cue</code>, with the same name.</p>
+    </div>
+
+    <p class="muted small">Examples for each are in the <a href="https://github.com/Gageformer/Ember#the-ember-menu">README</a>.</p>
+  </section>
+
   <div class="dither"></div>
 
   <section id="settings">
@@ -111,7 +135,7 @@ FILE "Spyro.bin" BINARY</pre>
     <p>Make a text file called <code>settings.txt</code> next to <code>ember.elf</code>. Write one setting on each line.</p>
 <pre>display: 480
 controller: auto</pre>
-    <p class="muted small">Want a setting for one game only? Put a <code>settings.txt</code> in that game's folder. All settings work there except <code>display</code>.</p>
+    <p class="muted small">Want a setting for one game only? Put a <code>settings.txt</code> in that game's folder. All settings work there except <code>display</code>, <code>menu</code>, <code>exit path</code> and <code>debug</code>.</p>
 
     <div class="table-scroll">
       <table>
@@ -120,10 +144,14 @@ controller: auto</pre>
         </thead>
         <tbody>
           <tr><td><code>display</code></td><td><b>480</b>, 240, 480p</td><td>Video mode. 480 works on almost every TV. 240 is best on a CRT.</td></tr>
+          <tr><td><code>deinterlace</code></td><td><b>blend</b>, weave</td><td>Only for 480p. Blend is smoother, weave is exact but can comb.</td></tr>
           <tr><td><code>timing</code></td><td><b>auto</b>, ntsc, pal</td><td>The game's speed clock. Auto follows the game's region.</td></tr>
           <tr><td><code>controller</code></td><td><b>auto</b>, analog, d2a</td><td>How the pad starts. Best set for each game.</td></tr>
           <tr><td><code>dither</code></td><td><b>on</b>, off</td><td>The PS1 dot pattern. On is native, off may look smoother.</td></tr>
-          <tr><td><code>shading</code></td><td><b>15</b>, 24</td><td>24 gives smoother colour. Some games utilize the quirks of 15-bit.</td></tr>
+          <tr><td><code>shading</code></td><td><b>15</b>, 24, 24d</td><td>24 gives smoother colour. 24d is 24, but darker, for games like Silent Hill.</td></tr>
+          <tr><td><code>menu</code></td><td><b>on</b>, off</td><td>The in-game Ember menu.</td></tr>
+          <tr><td><code>exit path</code></td><td><b>empty</b>, a path</td><td>Where Exit Game goes. Empty is the PS2 browser. Or give an ELF, like <code>mass:/APPS/OPNPS2LD.ELF</code>.</td></tr>
+          <tr><td><code>debug</code></td><td><b>off</b>, on</td><td>Shows the start-up log on the TV. Useful for reports.</td></tr>
         </tbody>
       </table>
     </div>
